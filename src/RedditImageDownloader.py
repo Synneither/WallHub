@@ -10,6 +10,7 @@ import time
 import concurrent.futures
 import sqlite3
 from contextlib import contextmanager
+from src.utils import existed_picture
 class RedditImageDownloader:
     def __init__(self):
         # 初始化日志系统
@@ -43,6 +44,8 @@ class RedditImageDownloader:
         # 获取现有图片哈希值
         self.existing_hashes = get_existing_hashes(self.save_dir, self.db_path)
         self.logger.info(f"🔍 发现 {len(self.existing_hashes)} 个已存在的图片文件")
+        self.existed_picture=existed_picture(self.db_path)
+        self.logger.info(f"🔍 文件中有 {len(self.existed_picture)} 个图片")
 
         self.logger.info("✅ 下载器初始化完成")
 
@@ -192,6 +195,8 @@ class RedditImageDownloader:
 
         existing_urls = self.get_existing_urls()
         self.logger.info(f"📊 数据库中已有 {len(existing_urls)} 个图片记录")
+       # existed_picture=src.utils.existed_picture(self.db_path)
+       # self.logger.info(f"📊 文件中已有 {len(existed_picture)} 个图片文件")
 
         # 超时/无进展控制
         start_time = time.time()

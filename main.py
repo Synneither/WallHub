@@ -1,4 +1,4 @@
-from RedditImageDownloader import RedditImageDownloader
+from src.RedditImageDownloader import RedditImageDownloader
 from src.WallhavenImageDownloader import WallhavenImageDownloader
 from src.DatabaseImageDownloader import (
     DatabaseImageDownloader,

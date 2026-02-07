@@ -22,6 +22,21 @@ def get_existing_hashes(save_dir, db_path=None):
         print(f"数据库错误: {e}")
     return existing_hashes
 
+def existed_picture(db_path=None):
+    """从数据库获取现有图片的哈希"""
+    if db_path is None:
+        db_path = 'images.db'  # 默认数据库
+    existing_hashes = set()
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT hash FROM images where stable=1")
+        rows = cursor.fetchall()
+        for row in rows:
+            existing_hashes.add(row[0])
+    except sqlite3.Error as e:
+        print(f"数据库错误: {e}")        
+    return existing_hashes
 def extract_image_url(post_data):
     """从Reddit API数据中提取图片URL"""
     try:
