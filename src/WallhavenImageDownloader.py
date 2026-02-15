@@ -10,7 +10,7 @@ from datetime import datetime
 from contextlib import contextmanager
 from urllib.parse import urlencode
 from config import WALLHAVEN_CONFIG
-from src.utils import get_existing_hashes, is_valid_image
+from src.utils import get_existing_hashes, is_valid_image,existed_picture
 
 
 class WallhavenImageDownloader:
@@ -58,8 +58,8 @@ class WallhavenImageDownloader:
         # 获取现有图片哈希值
         self.existing_hashes = get_existing_hashes(self.save_dir, self.db_path)
         self.logger.info(f"🔍 发现 {len(self.existing_hashes)} 个已存在的图片文件")
-        existed_picture=existed_picture(self.db_path)
-        self.logger.info(f"🔍 文件中有 {len(existed_picture)} 个已存在的图片文件")
+        self.existed_picture=existed_picture(self.db_path)
+        self.logger.info(f"🔍 文件中有 {len(self.existed_picture)} 个已存在的图片文件")
         self.logger.info("✅ Wallhaven下载器初始化完成")
 
     def _setup_logging(self):

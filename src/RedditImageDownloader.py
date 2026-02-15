@@ -8,6 +8,7 @@ from src.utils import get_existing_hashes, extract_image_url, is_valid_image
 import hashlib
 import time
 import concurrent.futures
+import random
 import sqlite3
 from contextlib import contextmanager
 from src.utils import existed_picture
