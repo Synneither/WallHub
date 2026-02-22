@@ -9,7 +9,7 @@ REDDIT_CONFIG = {
     'save_dir': os.path.expanduser("~/Pictures/背景/reddit"),
     'reddit_url': "https://www.reddit.com/r/Animewallpaper/?f=flair_name%3A%22Desktop%22",
     'max_posts': 100,
-    'max_images': 20,
+    'max_images': 100,
     # 超时与无进展限制：如果长时间没有找到新图片则停止搜索
     'max_search_seconds': 300,  # 最多搜索多少秒后放弃（默认 300 秒）
     'max_empty_batches': 1,     # 连续多少个批次没有新图片后停止（默认 5 批）
