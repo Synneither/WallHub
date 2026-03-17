@@ -26,6 +26,8 @@ def print_usage():
     print("  python main.py mark-unstable           - 标记所有源数据库中缺失的本地图片为 unstable")
     print("  python main.py reddit-mark-unstable    - 仅标记 Reddit 源")
     print("  python main.py wallhaven-mark-unstable - 仅标记 Wallhaven 源")
+    print("\n还原标记:")
+    print("  python main.py restore-stable          - 将所有 unstable 记录还原为 stable")
     print("=" * 60 + "\n")
 
 def main():
@@ -101,6 +103,17 @@ def main():
             w_updated = wallhaven_downloader.mark_missing_images_unstable()
             print(f"Wallhaven: 标记 {w_updated} 条记录为 unstable")
 
+            print("--- 同步文件夹到数据库 ---")
+            import subprocess
+            try:
+                result = subprocess.run([sys.executable, 'sync_folder_to_db.py'], capture_output=True, text=True)
+                if result.returncode == 0:
+                    print("同步完成")
+                else:
+                    print(f"同步失败: {result.stderr}")
+            except Exception as e:
+                print(f"同步出错: {e}")
+
         elif source == 'reddit-mark-unstable':
             print("🔎 标记 Reddit 源缺失的本地图片为 unstable...")
             reddit_downloader = RedditImageDownloader()
@@ -112,6 +125,52 @@ def main():
             wallhaven_downloader = WallhavenImageDownloader()
             updated = wallhaven_downloader.mark_missing_images_unstable()
             print(f"Wallhaven: 标记 {updated} 条记录为 unstable")
+
+            print("--- 同步 Wallhaven 文件夹到数据库 ---")
+            import subprocess
+            try:
+                result = subprocess.run([sys.executable, 'sync_folder_to_db.py'], capture_output=True, text=True)
+                if result.returncode == 0:
+                    print("同步完成")
+                else:
+                    print(f"同步失败: {result.stderr}")
+            except Exception as e:
+                print(f"同步出错: {e}")
+
+        elif source == 'restore-stable':
+            print("🔄 还原所有 unstable 记录为 stable...")
+            import sqlite3
+            from config import REDDIT_CONFIG, WALLHAVEN_CONFIG
+            
+            restored_count = 0
+            
+            # 还原 Reddit 数据库
+            try:
+                conn = sqlite3.connect(REDDIT_CONFIG['db_path'])
+                cursor = conn.cursor()
+                cursor.execute("UPDATE images SET stable = 1 WHERE stable = 0")
+                r_count = cursor.rowcount
+                conn.commit()
+                conn.close()
+                print(f"Reddit: 还原 {r_count} 条记录")
+                restored_count += r_count
+            except Exception as e:
+                print(f"Reddit 数据库还原失败: {e}")
+            
+            # 还原 Wallhaven 数据库
+            try:
+                conn = sqlite3.connect(WALLHAVEN_CONFIG['db_path'])
+                cursor = conn.cursor()
+                cursor.execute("UPDATE images SET stable = 1 WHERE stable = 0")
+                w_count = cursor.rowcount
+                conn.commit()
+                conn.close()
+                print(f"Wallhaven: 还原 {w_count} 条记录")
+                restored_count += w_count
+            except Exception as e:
+                print(f"Wallhaven 数据库还原失败: {e}")
+            
+            print(f"总共还原 {restored_count} 条记录为 stable")
         
         else:
             print(f"❌ 未知的命令: {source}")

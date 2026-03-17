@@ -90,7 +90,7 @@ class DatabaseImageDownloader:
                     return []
                 
                 # 获取所有图片
-                cursor.execute("SELECT id, name, url, hash FROM images")
+                cursor.execute("SELECT id, name, url, hash, wallhaven_id FROM images where stable=1")
                 images = cursor.fetchall()
                 
                 self.logger.info(f"📊 从数据库获取 {len(images)} 条图片记录")
@@ -100,11 +100,18 @@ class DatabaseImageDownloader:
             self.logger.error(f"❌ 数据库查询错误: {e}")
             return []
 
-    def generate_filename(self, image_hash, url):
+    def generate_filename(self, image_hash, url, wallhaven_id=None):
         """生成安全的文件名"""
+        import re
         # 提取扩展名
         extension = self._get_extension_from_url(url)
-        return f"{image_hash}.{extension}"
+        
+        # 如果是 Wallhaven 图片，使用 wallhaven_id 生成文件名
+        if wallhaven_id:
+            safe_id = re.sub(r'[^a-zA-Z0-9]', '', wallhaven_id)
+            return f"wallhaven_{safe_id}.{extension}"
+        else:
+            return f"{image_hash}.{extension}"
 
     def _get_extension_from_url(self, url):
         """从URL获取文件扩展名"""
@@ -128,7 +135,8 @@ class DatabaseImageDownloader:
         """下载单个图片"""
         url = image_data['url']
         image_hash = image_data['hash']
-        filename = self.generate_filename(image_hash, url)
+        wallhaven_id = image_data.get('wallhaven_id')
+        filename = self.generate_filename(image_hash, url, wallhaven_id)
         filepath = os.path.join(self.save_dir, filename)
         
         # 检查文件是否已存在

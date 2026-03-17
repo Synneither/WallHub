@@ -21,7 +21,7 @@ class WallhavenImageDownloader:
         self.logger = logging.getLogger('WallhavenImageDownloader')
         self.logger.info("🚀 初始化 Wallhaven 图片下载器...")
 
-        self.save_dir = WALLHAVEN_CONFIG.get('save_dir')
+        self.save_dir = os.path.expanduser(WALLHAVEN_CONFIG.get('save_dir'))
         self.api_url = WALLHAVEN_CONFIG.get('api_url')
         self.api_key = WALLHAVEN_CONFIG.get('api_key')  # 可选
         self.max_images = WALLHAVEN_CONFIG.get('max_images')
@@ -416,8 +416,9 @@ class WallhavenImageDownloader:
 
             image_hash = self.calculate_image_hash(image_data)
 
-            # 生成安全的文件名
-            filename = self.generate_safe_filename(image_hash, file_extension)
+            # 生成文件名：wallhaven_ + wallhaven_id
+            safe_id = re.sub(r'[^a-zA-Z0-9]', '', wallhaven_id)
+            filename = f"wallhaven_{safe_id}.{file_extension}"
 
             # 确保下载目录存在
             os.makedirs(self.save_dir, exist_ok=True)
