@@ -109,6 +109,8 @@ def main():
                 result = subprocess.run([sys.executable, 'sync_folder_to_db.py'], capture_output=True, text=True)
                 if result.returncode == 0:
                     print("同步完成")
+                    if result.stdout.strip():
+                        print(result.stdout.strip())
                 else:
                     print(f"同步失败: {result.stderr}")
             except Exception as e:
@@ -132,6 +134,8 @@ def main():
                 result = subprocess.run([sys.executable, 'sync_folder_to_db.py'], capture_output=True, text=True)
                 if result.returncode == 0:
                     print("同步完成")
+                    if result.stdout.strip():
+                        print(result.stdout.strip())
                 else:
                     print(f"同步失败: {result.stderr}")
             except Exception as e:
