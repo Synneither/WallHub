@@ -135,7 +135,7 @@ def main():
                 if result.returncode == 0:
                     print("同步完成")
                     if result.stdout.strip():
-                        print(result.stdout.strip())
+                        print(f"同步输出: {result.stdout.strip()}")
                 else:
                     print(f"同步失败: {result.stderr}")
             except Exception as e:
