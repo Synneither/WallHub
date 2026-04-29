@@ -14,13 +14,13 @@ def setup_logging():
     """设置日志"""
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
 def sync_folder_to_db():
     """同步文件夹中的 Wallhaven 图片到数据库"""
     setup_logging()
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger('Sync_Folder_To_Db')
 
     save_dir = WALLHAVEN_CONFIG.get('save_dir')
     db_path = WALLHAVEN_CONFIG.get('db_path')
@@ -102,10 +102,10 @@ def sync_folder_to_db():
     conn.close()
 
     logger.info("📊 同步统计:")
-    logger.info(f"  🔍 扫描文件总数: {total_files}")
-    logger.info(f"  ✅ 新增图片: {synced_count}")
-    logger.info(f"  ⏭️  跳过已存在: {skipped_count}")
-    logger.info(f"  ❌ 处理错误: {error_count}")
+    logger.info(f"🔍 扫描文件总数: {total_files}")
+    logger.info(f"✅ 新增图片: {synced_count}")
+    logger.info(f"⏭️  跳过已存在: {skipped_count}")
+    logger.info(f"❌ 处理错误: {error_count}")
     logger.info("🎉 同步完成")
 
 if __name__ == "__main__":
