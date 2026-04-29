@@ -111,6 +111,8 @@ def main():
                     print("同步完成")
                     if result.stdout.strip():
                         print(result.stdout.strip())
+                    if result.stderr.strip():
+                        print(result.stderr.strip())
                 else:
                     print(f"同步失败: {result.stderr}")
             except Exception as e:

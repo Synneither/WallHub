@@ -38,9 +38,14 @@ def sync_folder_to_db():
     cursor = conn.cursor()
 
     synced_count = 0
+    skipped_count = 0
+    error_count = 0
+    total_files = 0
 
     # 扫描文件夹
+    logger.info(f"🔍 开始扫描文件夹: {save_dir}")
     for filename in os.listdir(save_dir):
+        total_files += 1
         if not filename.startswith('wallhaven_'):
             continue
 
@@ -55,12 +60,14 @@ def sync_folder_to_db():
             image_hash = hashlib.md5(data).hexdigest()
         except Exception as e:
             logger.error(f"计算哈希失败 {filename}: {e}")
+            error_count += 1
             continue
 
         # 检查数据库中是否已有此哈希
         cursor.execute("SELECT id FROM images WHERE hash = ?", (image_hash,))
         if cursor.fetchone():
             logger.debug(f"图片已存在于数据库: {filename}")
+            skipped_count += 1
             continue
 
         # 提取 wallhaven_id
@@ -68,6 +75,7 @@ def sync_folder_to_db():
             id_part = filename.split('_')[1].split('.')[0]
         except IndexError:
             logger.warning(f"无法提取 ID: {filename}")
+            error_count += 1
             continue
 
         # 构造 URL
@@ -81,17 +89,24 @@ def sync_folder_to_db():
                 (id_part, filename, image_hash, wallhaven_url, source_url, 'unknown', 1)
             )
             synced_count += 1
-            logger.info(f"添加图片到数据库: {filename}")
+            logger.info(f"✅ 添加图片到数据库: {filename}")
         except sqlite3.IntegrityError as e:
             logger.warning(f"插入失败 (可能重复): {filename} - {e}")
+            skipped_count += 1
         except Exception as e:
             logger.error(f"插入数据库失败: {filename} - {e}")
+            error_count += 1
 
     # 提交更改
     conn.commit()
     conn.close()
 
-    logger.info(f"同步完成，共添加 {synced_count} 个图片到数据库")
+    logger.info("📊 同步统计:")
+    logger.info(f"  🔍 扫描文件总数: {total_files}")
+    logger.info(f"  ✅ 新增图片: {synced_count}")
+    logger.info(f"  ⏭️  跳过已存在: {skipped_count}")
+    logger.info(f"  ❌ 处理错误: {error_count}")
+    logger.info("🎉 同步完成")
 
 if __name__ == "__main__":
     sync_folder_to_db()
