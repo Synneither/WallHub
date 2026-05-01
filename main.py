@@ -8,6 +8,7 @@ from src.DatabaseImageDownloader import (
 from config import REDDIT_CONFIG, WALLHAVEN_CONFIG
 import os
 import sys
+import sqlite3
 
 def print_usage():
     """打印使用说明"""
@@ -145,8 +146,7 @@ def main():
 
         elif source == 'restore-stable':
             print("🔄 还原所有 unstable 记录为 stable...")
-            import sqlite3
-            from config import REDDIT_CONFIG, WALLHAVEN_CONFIG
+            
             
             restored_count = 0
             
