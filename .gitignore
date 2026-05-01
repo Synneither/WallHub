@@ -50,7 +50,7 @@ coverage.xml
 # Translations
 
 # Secrets and API Keys
-secrets/
+secrets/api_keys.py
 *.env
 .env
 .env.local
